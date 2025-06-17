@@ -1,0 +1,16 @@
+services:
+  mlgg-frontend:
+    build: 
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8581:80"
+      - "4247:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
