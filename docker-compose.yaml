@@ -3,6 +3,8 @@ services:
     build: 
       context: ./
       dockerfile: Dockerfile
+    environment:
+      - RESEND_API_KEY=re_4jWQNBbY_7ywwXumXPN9ibaFCHusgTRiX
     ports:
       - "8581:80"
       - "4247:443"
