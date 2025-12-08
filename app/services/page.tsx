@@ -252,9 +252,8 @@ export default function ServicesPage() {
               </Button>
               <Button
                 asChild
-                variant="outline"
                 size="lg"
-                className="border-white text-white hover:bg-white hover:text-slate-900 text-lg px-8 py-6"
+                className="border-white text-white hover:bg-blue-700/95 text-lg px-8 py-6"
               >
                 <Link href="/about">Learn More About Us</Link>
               </Button>

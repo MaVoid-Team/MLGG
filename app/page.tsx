@@ -80,9 +80,8 @@ export default function HomePage() {
               </Button>
               <Button
                 asChild
-                variant="outline"
                 size="lg"
-                className="border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm text-lg px-10 py-8 rounded-2xl font-bold transition-all duration-300 hover:scale-105"
+                className="border-2 border-white/30 text-white hover:bg-blue-700/95 backdrop-blur-sm text-lg px-10 py-8 rounded-2xl font-bold transition-all duration-300 hover:scale-105"
               >
                 <Link href="/services">
                   <Target className="w-5 h-5 mr-2" />
@@ -352,9 +351,8 @@ export default function HomePage() {
                 </Button>
                 <Button
                   asChild
-                  variant="outline"
                   size="lg"
-                  className="border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm text-lg px-10 py-8 rounded-2xl font-bold transition-all duration-300 hover:scale-105"
+                  className="border-2 border-white/30 text-white hover:bg-blue-700/95 backdrop-blur-sm text-lg px-10 py-8 rounded-2xl font-bold transition-all duration-300 hover:scale-105"
                 >
                   <Link href="/about">
                     <Globe className="w-5 h-5 mr-2" />
