@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env?.RESEND_API_KEY || "");
+// Instantiate Resend lazily inside the request handler to avoid throwing during build when the API key isn't set.
 
 export async function POST(req: Request) {
   try {
-    if (!process.env?.RESEND_API_KEY) {
-      throw new Error("Resend API key is not configured.");
+    const apiKey = process.env?.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error("Resend API key is not configured. Set RESEND_API_KEY in your deployment environment.");
     }
+    const resend = new Resend(apiKey);
     const body = await req.json();
 
     const data = await resend.emails.send({
