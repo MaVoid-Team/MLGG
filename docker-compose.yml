@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  mlgg:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mlgg-app
+    restart: unless-stopped
+    environment:
+      # Node environment
+      - NODE_ENV=production
+      
+      # Resend API for email functionality
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      
+      # Port the app will listen on inside the container
+      - PORT=3000
+    
+    # Don't expose ports directly; Nginx will handle routing
+    ports:
+      - "3021:3000"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3021/MLGG"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Resource limits (adjust based on your VPS capacity)
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    
+    networks:
+      - webapps
+
+networks:
+  webapps:
+    driver: bridge

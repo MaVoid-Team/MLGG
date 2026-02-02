@@ -1,0 +1,118 @@
+# Nginx configuration for MLGG app
+# This file should be placed in /etc/nginx/sites-available/mlgg on your VPS
+# Then create a symlink: ln -s /etc/nginx/sites-available/mlgg /etc/nginx/sites-enabled/mlgg
+
+upstream mlgg_upstream {
+    # Docker container hostname (service name from docker-compose.yml)
+    # If running on same host, this can be 'mlgg:3000'
+    # If running on different host, use: 'your-docker-host-ip:3000'
+    server mlgg:3000;
+
+    # Optional: Add keepalive connections for better performance
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    server_name _;  # Change this to your domain if needed (e.g., example.com)
+
+    # Increase client body size for form uploads (adjust as needed)
+    client_max_body_size 10M;
+
+    # Gzip compression
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+    gzip_vary on;
+    gzip_min_length 1000;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
+
+    # Rate limiting (optional - uncomment to enable)
+    # limit_req_zone $binary_remote_addr zone=mlgg_limit:10m rate=10r/s;
+    # limit_req zone=mlgg_limit burst=20 nodelay;
+
+    # MLGG application
+    location /MLGG/ {
+        # Proxy settings
+        proxy_pass http://mlgg_upstream/MLGG/;
+        proxy_http_version 1.1;
+        
+        # Headers for proper proxying
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        
+        # WebSocket support (if needed in the future)
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+        
+        # Buffering
+        proxy_buffering on;
+        proxy_buffer_size 4k;
+        proxy_buffers 8 4k;
+        proxy_busy_buffers_size 8k;
+    }
+
+    # Health check endpoint (optional - for monitoring)
+    location /health {
+        access_log off;
+        proxy_pass http://mlgg_upstream/MLGG;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+
+    # Redirect root to MLGG
+    location / {
+        return 301 $scheme://$host/MLGG/;
+    }
+
+    # Deny access to hidden files
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    # Logging
+    access_log /var/log/nginx/mlgg_access.log combined buffer=32k flush=5s;
+    error_log /var/log/nginx/mlgg_error.log warn;
+}
+
+# Optional: HTTPS configuration (uncomment when you have SSL certificates)
+# server {
+#     listen 443 ssl http2;
+#     server_name your-domain.com www.your-domain.com;
+#
+#     # SSL configuration
+#     ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+#
+#     # SSL security settings
+#     ssl_protocols TLSv1.2 TLSv1.3;
+#     ssl_ciphers HIGH:!aNULL:!MD5;
+#     ssl_prefer_server_ciphers on;
+#     ssl_session_cache shared:SSL:10m;
+#     ssl_session_timeout 10m;
+#
+#     # Include the location blocks from above
+#     # ... (copy the location blocks here)
+# }
+#
+# # Redirect HTTP to HTTPS
+# server {
+#     listen 80;
+#     server_name your-domain.com www.your-domain.com;
+#     return 301 https://$server_name$request_uri;
+# }
