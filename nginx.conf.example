@@ -1,3 +1,4 @@
+
 # Nginx configuration for MLGG app
 # This file should be placed in /etc/nginx/sites-available/mlgg on your VPS
 # Then create a symlink: ln -s /etc/nginx/sites-available/mlgg /etc/nginx/sites-enabled/mlgg
@@ -6,15 +7,14 @@ upstream mlgg_upstream {
     # Docker container hostname (service name from docker-compose.yml)
     # If running on same host, this can be 'mlgg:3000'
     # If running on different host, use: 'your-docker-host-ip:3000'
-    server mlgg:3000;
+    server mlgg:3021;
 
     # Optional: Add keepalive connections for better performance
     keepalive 32;
 }
 
 server {
-    listen 80;
-    server_name _;  # Change this to your domain if needed (e.g., example.com)
+    server_name mlgg.mavoid.com;  # Change this to your domain if needed (e.g., example.com)
 
     # Increase client body size for form uploads (adjust as needed)
     client_max_body_size 10M;
@@ -35,10 +35,46 @@ server {
     # limit_req_zone $binary_remote_addr zone=mlgg_limit:10m rate=10r/s;
     # limit_req zone=mlgg_limit burst=20 nodelay;
 
+    # MIME types - ensure static assets are served with correct types
+    types {
+        text/html                             html htm;
+        text/css                              css;
+        application/javascript                js;
+        application/json                      json;
+        image/gif                             gif;
+        image/jpeg                            jpg jpeg;
+        image/png                             png;
+        image/svg+xml                         svg svgz;
+        image/webp                            webp;
+        font/woff                             woff;
+        font/woff2                            woff2;
+        font/ttf                              ttf;
+        font/otf                              otf;
+        application/octet-stream              bin exe dll;
+    }
+    default_type application/octet-stream;
+
+    # Static files - cache aggressively since Next.js uses content hashing
+    location ~* ^/(_next|static)/ {
+        proxy_pass http://mlgg_upstream;
+        proxy_http_version 1.1;
+        
+        # Cache static assets for 1 year (they have content hashes in filenames)
+        expires 365d;
+        add_header Cache-Control "public, immutable";
+        add_header X-Content-Type-Options "nosniff" always;
+        
+        # Headers
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     # MLGG application
-    location /MLGG/ {
+    location / {
         # Proxy settings
-        proxy_pass http://mlgg_upstream/MLGG/;
+        proxy_pass http://mlgg_upstream/;
         proxy_http_version 1.1;
         
         # Headers for proper proxying
@@ -63,19 +99,10 @@ server {
         proxy_buffer_size 4k;
         proxy_buffers 8 4k;
         proxy_busy_buffers_size 8k;
-    }
-
-    # Health check endpoint (optional - for monitoring)
-    location /health {
-        access_log off;
-        proxy_pass http://mlgg_upstream/MLGG;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-    }
-
-    # Redirect root to MLGG
-    location / {
-        return 301 $scheme://$host/MLGG/;
+        
+        # Don't cache HTML pages
+        expires -1;
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
     }
 
     # Deny access to hidden files
@@ -88,6 +115,13 @@ server {
     # Logging
     access_log /var/log/nginx/mlgg_access.log combined buffer=32k flush=5s;
     error_log /var/log/nginx/mlgg_error.log warn;
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/mlgg.mavoid.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/mlgg.mavoid.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
 }
 
 # Optional: HTTPS configuration (uncomment when you have SSL certificates)
@@ -116,3 +150,17 @@ server {
 #     server_name your-domain.com www.your-domain.com;
 #     return 301 https://$server_name$request_uri;
 # }
+
+
+server {
+    if ($host = mlgg.mavoid.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name mlgg.mavoid.com;
+    return 404; # managed by Certbot
+
+
+}
