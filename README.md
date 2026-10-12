@@ -1,30 +1,27 @@
-# MaVoid sub brand site
+# MLGG
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+MaVoid Lead Generation Group — premium real estate investment leads that convert.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/ziadahmed252525-gmailcoms-projects/v0-ma-void-sub-brand-site)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/bjhnqI1RhTP)
+For serious investors and acquisition teams who need verified US investment opportunities, backed by international expertise across Oman, KSA, Egypt, and the UAE.
 
-## Overview
+## What you can do
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+- See what kinds of leads MLGG delivers (distressed, absentee, off-market, and more)
+- Browse services tailored to real-estate investors
+- Learn how international verification and US market expertise fit together
+- Reach the team from About / Contact for a lead package
+- Read privacy and terms before you share data
 
-## Deployment
+## Try it
 
-Your project is live at:
+Clone the repo and run the Next.js app locally (`npm install` then `npm run dev`). No public production URL is listed on the repo yet.
 
-**[https://vercel.com/ziadahmed252525-gmailcoms-projects/v0-ma-void-sub-brand-site](https://vercel.com/ziadahmed252525-gmailcoms-projects/v0-ma-void-sub-brand-site)**
+## How it works
 
-## Build your app
+Public marketing pages (home, services, about, contact) plus a contact email API. This is the MLGG brand site — not a lead CRM.
 
-Continue building your app on:
+---
 
-**[https://v0.dev/chat/projects/bjhnqI1RhTP](https://v0.dev/chat/projects/bjhnqI1RhTP)**
+Built by [Ziad Ahmed](https://github.com/Ziad-NasrEldin) at [MaVoid](https://mavoid.com).
 
-## How It Works
-
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+[Website](https://mavoid.com) · [LinkedIn](https://linkedin.com/in/ziad-ahmed-634202332) · [GitHub](https://github.com/Ziad-NasrEldin)
